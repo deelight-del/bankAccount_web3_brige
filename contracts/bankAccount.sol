@@ -35,41 +35,39 @@ contract Bank {
    * @notice Function to register an account in the bank.
    */
   function registerAccount() public {
-    require(hasRegistered(msg.sender), "Account has been registered before.");
+    require(hasRegistered(msg.sender) == false, "Account has been registered before.");
     registeredAccounts.push(msg.sender);
   }
 
   /**
    * @notice deposit - Function to deposit into an account.
-   * @param _amount : The amount to deposit.
    */
-  function deposit(uint _amount) public {
-    require(!hasRegistered(msg.sender), 'Your account has not been registered.\n Proceed to registration');
-    accountBalances[msg.sender] += _amount;
+  function deposit() public payable {
+    require(hasRegistered(msg.sender) == true, 'Your account has not been registered.\n Proceed to registration');
+    accountBalances[msg.sender] += msg.value;
   }
 
   /**
    * @notice withdraw value from your account, provided you have sufficient funds.
-   * @param _amount the amount to withdraw.
    */
 
-  function withdraw(uint _amount) public {
-    require(!hasRegistered(msg.sender), 'Your account has not been registered.\n Proceed to registration');
-    require(accountBalances[msg.sender] < _amount, 'Insufficient balance');
-    accountBalances[msg.sender] -= _amount;
+  function withdraw() public payable {
+    require(hasRegistered(msg.sender) == true, 'Your account has not been registered.\n Proceed to registration');
+    require(accountBalances[msg.sender] <= msg.value, 'Insufficient balance');
+    accountBalances[msg.sender] -= msg.value;
   }
 
   /**
    * @notice transfer some amount from one account to another account.
-   * @param _amount the amouunt to transfer.
+   * @param _recepient : Address of the recepient of the contract.
    */
 
-  function transfer(uint _amount, address _recepient) public {
-    require(!hasRegistered(msg.sender), 'Your account has not been registered.\n Proceed to registration');
-    require(!hasRegistered(_recepient), 'Recepient account has not been registered.\n Tell them to register');
-    require(accountBalances[msg.sender] < _amount, 'Insufficient balance');
-    accountBalances[msg.sender] -= _amount;
-    accountBalances[_recepient] += _amount;
+  function transfer(address _recepient) public payable {
+    require(hasRegistered(msg.sender) == true, 'Your account has not been registered.\n Proceed to registration');
+    require(hasRegistered(_recepient) == true, 'Recepient account has not been registered.\n Tell them to register');
+    require(accountBalances[msg.sender] <= msg.value, 'Insufficient balance');
+    accountBalances[msg.sender] -= msg.value;
+    accountBalances[_recepient] += msg.value;
   }
   // TODO: assign 1 wei to every user as they come in. This will reduce number of data struct used.
 }
